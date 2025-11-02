@@ -10,10 +10,10 @@ Summary:
 
 ### Foundational Model Training Flow
 ```markdown
-![Diagram](/media/foundation_training_flow.png?raw=true "diagram")
+![Diagram](media/foundation_training_flow.png?raw=true "diagram")
 ```
 
 ### Retraining Model Flow
 ```markdown
-![diagram](/media/retraining_flow.png?raw=true "diagram")
+![diagram](media/retraining_flow.png?raw=true "diagram")
 ```
