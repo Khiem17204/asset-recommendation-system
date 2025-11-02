@@ -1,0 +1,68 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# MLflow
+mlruns/
+mlartifacts/
+
+
+# Large files and logs
+*.log
+logs/
+*.gz
+*.zip
+*.tar
+
+# OS-specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Kubernetes
+*.kubeconfig
+
+# Kafka
+kafka-logs/
+zookeeper-data/
+
+# Minikube
+~/.minikube/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# FastAPI
+.pytest_cache/
+
+# Environment variables
+.env.local
+.env.*.local
+
