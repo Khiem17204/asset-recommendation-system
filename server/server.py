@@ -6,6 +6,9 @@ from .database import (
     insert_asset_information,
     insert_customer_information,
     execute_upsert,
+    batch_insert_customer_information,
+    batch_insert_close_prices,
+    batch_insert_transactions,
 )
 from .data_class import (
     CustomerInformationRow,
@@ -143,6 +146,66 @@ def ingest_row(
         return {"status": "ok"}
 
     raise HTTPException(status_code=400, detail="Unsupported dataset")
+
+
+@app.post("/data/training/{dataset}/batch")
+def ingest_batch(
+    dataset: DatasetName = Path(..., description="Target table to insert into"),
+    payload: list[dict] = None,
+):
+    """Batch insert endpoint for customer_information and close_prices."""
+    if payload is None or not isinstance(payload, list):
+        raise HTTPException(status_code=400, detail="Request body must be a list of rows")
+
+    if dataset == "customer_information":
+        rows = []
+        for item in payload:
+            row = CustomerInformationRow(**item)
+            rows.append((
+                row.customerID,
+                row.customerType,
+                row.riskLevel,
+                row.investmentCapacity,
+                row.lastQuestionnaireDate,
+                row.timestamp,
+            ))
+        batch_insert_customer_information(rows)
+        return {"status": "ok", "rows_inserted": len(rows)}
+
+    if dataset == "close_prices":
+        rows = []
+        for item in payload:
+            row = ClosePricesRow(**item)
+            rows.append((
+                row.ISIN,
+                row.timestamp,
+                row.closePrice,
+            ))
+        batch_insert_close_prices(rows)
+        return {"status": "ok", "rows_inserted": len(rows)}
+
+    if dataset == "transactions":
+        rows = []
+        for item in payload:
+            row = TransactionsRow(**item)
+            rows.append((
+                row.customerID,
+                row.ISIN,
+                row.transactionID,
+                row.transactionType,
+                row.timestamp,
+                row.totalValue,
+                row.units,
+                row.channel,
+                row.marketID,
+            ))
+        batch_insert_transactions(rows)
+        return {"status": "ok", "rows_inserted": len(rows)}
+
+    raise HTTPException(
+        status_code=400,
+        detail=f"Batch insert not supported for dataset: {dataset}. Supported: customer_information, close_prices, transactions"
+    )
 
 
 @app.get("/health")

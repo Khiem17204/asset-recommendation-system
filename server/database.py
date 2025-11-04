@@ -41,6 +41,17 @@ def execute_upsert(sql: str, params: Tuple) -> None:
         _pool.putconn(connection)
 
 
+def execute_batch_upsert(sql: str, params_list: list[Tuple]) -> None:
+    """Execute a batch INSERT ... ON CONFLICT UPDATE query."""
+    connection = _pool.getconn()
+    try:
+        with connection:
+            with connection.cursor() as cursor:
+                cursor.executemany(sql, params_list)
+    finally:
+        _pool.putconn(connection)
+
+
 def insert_customer_information(
     customer_id: str,
     customer_type: str,
@@ -150,6 +161,15 @@ def insert_close_prices(isin: str, timestamp, close_price: float) -> None:
     execute_upsert(sql, params)
 
 
+def batch_insert_close_prices(rows: list[tuple]) -> None:
+    """Batch insert or update close prices."""
+    sql = (
+        "INSERT INTO close_prices (ISIN, timestamp, closePrice) VALUES (%s, %s, %s) "
+        "ON CONFLICT (ISIN, timestamp) DO UPDATE SET closePrice = EXCLUDED.closePrice"
+    )
+    execute_batch_upsert(sql, rows)
+
+
 def insert_limit_prices(
     isin: str,
     min_date,
@@ -175,6 +195,32 @@ def insert_limit_prices(
         profitability,
     )
     execute_upsert(sql, params)
+
+
+def batch_insert_customer_information(rows: list[tuple]) -> None:
+    """Batch insert or update customer information."""
+    sql = (
+        "INSERT INTO customer_information (customerID, customerType, riskLevel, "
+        "investmentCapacity, lastQuestionnaireDate, timestamp) VALUES (%s, %s, %s, %s, %s, %s) "
+        "ON CONFLICT (customerID, timestamp) DO UPDATE SET "
+        "customerType = EXCLUDED.customerType, "
+        "riskLevel = EXCLUDED.riskLevel, "
+        "investmentCapacity = EXCLUDED.investmentCapacity, "
+        "lastQuestionnaireDate = EXCLUDED.lastQuestionnaireDate"
+    )
+    execute_batch_upsert(sql, rows)
+
+
+def batch_insert_limit_prices(rows: list[tuple]) -> None:
+    """Batch insert or update limit prices."""
+    sql = (
+        "INSERT INTO limit_prices (ISIN, minDate, maxDate, priceMinDate, priceMaxDate, profitability) "
+        "VALUES (%s, %s, %s, %s, %s, %s) "
+        "ON CONFLICT (ISIN) DO UPDATE SET "
+        "minDate = EXCLUDED.minDate, maxDate = EXCLUDED.maxDate, priceMinDate = EXCLUDED.priceMinDate, "
+        "priceMaxDate = EXCLUDED.priceMaxDate, profitability = EXCLUDED.profitability"
+    )
+    execute_batch_upsert(sql, rows)
 
 
 def insert_transactions(
@@ -209,4 +255,17 @@ def insert_transactions(
         market_id,
     )
     execute_upsert(sql, params)
+
+
+def batch_insert_transactions(rows: list[tuple]) -> None:
+    """Batch insert or update transactions."""
+    sql = (
+        "INSERT INTO transactions (customerID, ISIN, transactionID, transactionType, timestamp, totalValue, units, channel, marketID) "
+        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) "
+        "ON CONFLICT (transactionID) DO UPDATE SET "
+        "customerID = EXCLUDED.customerID, ISIN = EXCLUDED.ISIN, transactionType = EXCLUDED.transactionType, "
+        "timestamp = EXCLUDED.timestamp, totalValue = EXCLUDED.totalValue, units = EXCLUDED.units, "
+        "channel = EXCLUDED.channel, marketID = EXCLUDED.marketID"
+    )
+    execute_batch_upsert(sql, rows)
 
