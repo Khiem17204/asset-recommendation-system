@@ -114,7 +114,7 @@ def insert_batch(dataset: str, payload_list: list[Dict[str, Any]], batch_size: i
     return success_count, error_count
 
 
-def process_csv_file(csv_path: Path, dataset: str, parallel: int = 1, use_batch: bool = False) -> tuple[int, int]:
+def process_csv_file(csv_path: Path, dataset: str, use_batch: bool = False) -> tuple[int, int]:
     """Process a single CSV file and insert all rows.
 
     If parallel > 1 and dataset is 'close_prices', rows will be inserted concurrently.
@@ -142,25 +142,6 @@ def process_csv_file(csv_path: Path, dataset: str, parallel: int = 1, use_batch:
                 success, errors = insert_batch(dataset, payloads)
                 success_count = success
                 error_count = errors
-
-            elif parallel > 1 and dataset == "close_prices":
-                from concurrent.futures import ThreadPoolExecutor, as_completed
-
-                def task(row):
-                    payload = convert_row_to_dict(row, dataset)
-                    return insert_row(dataset, payload)
-
-                with ThreadPoolExecutor(max_workers=parallel) as executor:
-                    futures = [executor.submit(task, row) for row in rows]
-                    for future in tqdm(as_completed(futures), total=len(futures), desc=f"Inserting {dataset}", unit="rows"):
-                        try:
-                            ok = future.result()
-                            if ok:
-                                success_count += 1
-                            else:
-                                error_count += 1
-                        except Exception:
-                            error_count += 1
             else:
                 # Use tqdm for progress bar
                 for row in tqdm(rows, desc=f"Inserting {dataset}", unit="rows"):
@@ -217,8 +198,6 @@ def main():
         if dataset in ("customer_information", "close_prices", "transactions"):
             # Use batch insert for selected datasets
             success, errors = process_csv_file(csv_path, dataset, use_batch=True)
-        else:
-            success, errors = process_csv_file(csv_path, dataset, parallel=4)
         total_success += success
         total_errors += errors
         
