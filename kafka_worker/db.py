@@ -124,3 +124,16 @@ def get_user_interactions(user_name: str, limit: int = 1000) -> List[dict]:
     finally:
         _pool.putconn(connection)
 
+def get_dataset(dataset_name: str) -> List[dict]:
+    """Get dataset from database."""
+    connection = _pool.getconn()
+    try:
+        with connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM %s",
+                    (dataset_name,),
+                )
+                return cursor.fetchall()
+    finally:
+        _pool.putconn(connection)
