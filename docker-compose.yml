@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres/data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
   server:
     build: ./server
@@ -65,4 +65,16 @@ services:
       - kafka
       - db
 
+  ui:
+    build: ./ui
+    container_name: asset-recommendation-ui
+    ports:
+      - "4200:80"
+    depends_on:
+      - server
+    environment:
+      - API_URL=http://localhost:8000
+
+volumes:
+  postgres_data:
 

@@ -1,0 +1,111 @@
+<div class="recommendations-container">
+  <!-- Search/Input Section -->
+  <div class="search-section">
+    <mat-card class="search-card">
+      <mat-card-content>
+        <div class="search-form">
+          <mat-form-field appearance="outline" class="customer-input">
+            <mat-label>Customer ID</mat-label>
+            <input matInput [(ngModel)]="customerId" placeholder="Enter Customer ID">
+            <mat-icon matPrefix>person</mat-icon>
+          </mat-form-field>
+          
+          <div class="button-group">
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="requestRecommendations()"
+              [disabled]="requesting"
+              class="action-button">
+              <mat-icon>{{ requesting ? 'hourglass_empty' : 'refresh' }}</mat-icon>
+              <span>{{ requesting ? 'Requesting...' : 'Get Recommendations' }}</span>
+            </button>
+            
+            <button 
+              mat-stroked-button 
+              (click)="loadRecommendations()"
+              [disabled]="loading"
+              class="action-button">
+              <mat-icon>search</mat-icon>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="60"></mat-spinner>
+    <p>Loading recommendations...</p>
+  </div>
+
+  <!-- Recommendations Grid -->
+  <div *ngIf="!loading && recommendations.length > 0" class="recommendations-grid">
+    <mat-card 
+      *ngFor="let rec of recommendations" 
+      class="asset-card"
+      [class]="'asset-card-' + rec.assetcategory.toLowerCase()"
+      (click)="onAssetClick(rec)">
+      
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="category-badge">
+          <mat-icon>{{ getCategoryIcon(rec.assetcategory) }}</mat-icon>
+          <span>{{ rec.assetcategory }}</span>
+        </div>
+        <div class="profitability-badge" [ngClass]="getProfitabilityColor(rec.profitability)">
+          <mat-icon>{{ getProfitabilityIcon(rec.profitability) }}</mat-icon>
+          <span>{{ formatPercent(rec.profitability) }}</span>
+        </div>
+      </div>
+
+      <!-- Asset Name -->
+      <mat-card-title class="asset-name">
+        {{ rec.assetname }}
+      </mat-card-title>
+
+      <!-- Asset Details -->
+      <mat-card-content class="asset-details">
+        <div class="detail-row">
+          <mat-icon class="detail-icon">fingerprint</mat-icon>
+          <span class="detail-label">ISIN:</span>
+          <span class="detail-value">{{ rec.isin }}</span>
+        </div>
+        
+        <div class="detail-row" *ngIf="rec.sector">
+          <mat-icon class="detail-icon">business</mat-icon>
+          <span class="detail-label">Sector:</span>
+          <span class="detail-value">{{ rec.sector }}</span>
+        </div>
+        
+        <div class="detail-row" *ngIf="rec.industry">
+          <mat-icon class="detail-icon">domain</mat-icon>
+          <span class="detail-label">Industry:</span>
+          <span class="detail-value">{{ rec.industry }}</span>
+        </div>
+      </mat-card-content>
+
+      <!-- Price Section -->
+      <mat-card-footer class="card-footer">
+        <div class="price-section">
+          <div class="price-label">Current Price</div>
+          <div class="price-value">{{ formatPrice(rec.current_price) }}</div>
+        </div>
+        <div class="click-hint">
+          <mat-icon>touch_app</mat-icon>
+          <span>Click to track</span>
+        </div>
+      </mat-card-footer>
+    </mat-card>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && recommendations.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">inbox</mat-icon>
+    <h3>No Recommendations Found</h3>
+    <p>Enter a customer ID and click "Get Recommendations" to generate personalized asset recommendations.</p>
+  </div>
+</div>
+

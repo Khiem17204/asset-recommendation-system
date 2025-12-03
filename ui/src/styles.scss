@@ -1,0 +1,83 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: #333;
+}
+
+/* Material Design Overrides */
+.mat-mdc-form-field {
+  width: 100%;
+  display: block;
+}
+
+.mat-mdc-form-field-subscript-wrapper {
+  position: relative;
+}
+
+.mat-mdc-form-field-label {
+  display: block;
+}
+
+.mdc-text-field--outlined {
+  .mdc-notched-outline {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: rgba(0, 0, 0, 0.38);
+    }
+  }
+}
+
+.mdc-text-field--focused {
+  .mdc-notched-outline {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: #667eea;
+      border-width: 2px;
+    }
+  }
+}
+
+.mat-mdc-snack-bar-container {
+  &.snackbar-success {
+    background-color: #4CAF50 !important;
+    color: white !important;
+  }
+
+  &.snackbar-error {
+    background-color: #F44336 !important;
+    color: white !important;
+  }
+
+  &.snackbar-info {
+    background-color: #2196F3 !important;
+    color: white !important;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

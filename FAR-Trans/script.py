@@ -198,6 +198,9 @@ def main():
         if dataset in ("customer_information", "close_prices", "transactions"):
             # Use batch insert for selected datasets
             success, errors = process_csv_file(csv_path, dataset, use_batch=True)
+        else:
+            # Use single row insert for other datasets
+            success, errors = process_csv_file(csv_path, dataset, use_batch=False)
         total_success += success
         total_errors += errors
         

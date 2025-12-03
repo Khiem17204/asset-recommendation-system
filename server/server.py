@@ -1,6 +1,7 @@
 from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Path
+from fastapi.middleware.cors import CORSMiddleware
 
 from .database import (
     insert_asset_information,
@@ -46,6 +47,15 @@ def get_kafka_producer():
     raise Exception("Failed to connect to Kafka")
 
 app = FastAPI(title="Asset Recommendation")
+
+# Add CORS middleware to allow requests from the Angular UI
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 producer = get_kafka_producer()
 
